@@ -1,0 +1,40 @@
+apiVersion: 2018-06-01
+location: eastus
+name: nextcloudgroup
+properties:
+  containers:
+  - name: mysql
+    properties:
+      image: mysql:5.7
+      resources:
+        requests:
+          cpu: 2
+          memoryInGb: 4
+      ports:
+      - port: 3306
+      environmentVariables:
+        - "name": "MYSQL_DATABASE"
+          "value": "nextcloud"
+        - "name": "MYSQL_USER"
+          "value": "nextcloud"
+        - "name": "MYSQL_PASSWORD"
+          "value": ""
+        - "name": "MYSQL_ROOT_PASSWORD"
+          "value": ""
+      volumeMounts:
+      - name: db
+        mountPath: /var/lib/mysql
+  osType: Linux
+  ipAddress:
+    type: Public
+    ports: []
+    dnsNameLabel: ipnextcloud
+  volumes:
+  - name: db
+    azureFile:
+      shareName: "database"
+      storageAccountName: "nextcloudsa"
+      storageAccountKey: ""
+tags: 
+  remove: "yes"
+type: Microsoft.ContainerInstance/containerGroups

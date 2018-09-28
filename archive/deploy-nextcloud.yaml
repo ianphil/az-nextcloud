@@ -1,0 +1,25 @@
+apiVersion: 2018-06-01
+location: eastus
+name: nextcloudsimplegroup
+properties:
+  containers:
+  - name: nextcloud
+    properties:
+      image: nextcloud:14.0.0-apache
+      resources:
+        requests:
+          cpu: 1
+          memoryInGb: 2
+      ports:
+      - port: 80
+        protocol: tcp
+  osType: Linux
+  ipAddress:
+    type: Public
+    ports:
+    - protocol: tcp
+      port: '80'
+    dnsNameLabel: ipnextcloudsimple
+tags: 
+  remove: 'true'
+type: Microsoft.ContainerInstance/containerGroups

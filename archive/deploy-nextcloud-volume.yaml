@@ -1,0 +1,33 @@
+apiVersion: 2018-06-01
+location: eastus
+name: nextcloudgroup
+properties:
+  containers:
+  - name: nextcloud
+    properties:
+      image: nextcloud:14.0.0-apache
+      resources:
+        requests:
+          cpu: 2
+          memoryInGb: 4
+      ports:
+      - port: 80
+      volumeMounts:
+        - name: ncdata
+          mountPath: /var/www/html
+  osType: Linux
+  ipAddress:
+    type: Public
+    ports:
+    - protocol: tcp
+      port: '80'
+    dnsNameLabel: ipnextcloud
+  volumes:
+    - name: ncdata
+      azureFile:
+        shareName: "nextcloud"
+        storageAccountName: "nextcloudsa"
+        storageAccountKey: ""
+tags: 
+  remove: 'true'
+type: Microsoft.ContainerInstance/containerGroups

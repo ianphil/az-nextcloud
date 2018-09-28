@@ -1,0 +1,52 @@
+# Bring in bash helper functions
+source func_file.sh 
+
+# Always eat your variables!
+RG="nextcloudrg"
+LOCATION="eastus"
+SANAME="nextcloudsa"
+NCSHARENAME="nextcloud"
+DBSHARENAME="database"
+YAMLFILE="deploy-nextcloud-volume-mysql.yaml"
+CONTAINERGROUPNAME="nextcloudgroup"
+CONTAINERNAME="nextcloud"
+
+# Create resource group
+az group create --name $RG --location $LOCATION
+
+# Create Storage Accout
+az storage account create --resource-group $RG --name $SANAME --location $LOCATION --sku Standard_LRS
+
+# Get SA connection string
+CONN=$(az storage account show-connection-string --name $SANAME --resource-group $RG --output tsv)
+
+# Create AFS NextCloud data share
+az storage share create --name $NCSHARENAME --connection-string $CONN
+
+# Create AFS NextCloud database share
+az storage share create --name $DBSHARENAME --connection-string $CONN
+
+# Get keys for YAML file
+az storage account keys list --account-name $SANAME --resource-group $RG
+
+# Create NextCloud Container
+az container create --resource-group $RG --file $YAMLFILE
+
+# az storage share delete --name $NCSHARENAME --connection-string $CONN
+# az storage share delete --name $DBSHARENAME --connection-string $CONN
+# az container delete --name $CONTAINERGROUPNAME --resource-group $RG --yes
+
+# List containers in group
+az container show --resource-group $RG --name $CONTAINERGROUPNAME --output table
+
+# Get container logs
+az container logs --resource-group $RG --name $CONTAINERGROUPNAME --container-name $CONTAINERNAME
+
+# Get container output stream
+az container attach --resource-group $RG --name $CONTAINERGROUPNAME --container-name $CONTAINERNAME
+
+# Enter container
+az container exec --resource-group $RG --name $CONTAINERGROUPNAME --container-name $CONTAINERNAME --exec-command /bin/bash
+
+# Delete resource groups
+clean_sub
